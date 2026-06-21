@@ -441,75 +441,200 @@ type AnyError = BaseError &
   },
 };
 
+const CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #080C18; }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: #0A0E1A; }
+  ::-webkit-scrollbar-thumb { background: #1E2E50; border-radius: 3px; }
+  button:focus-visible { outline: 2px solid #5B8DFF; outline-offset: 2px; }
+  button:focus:not(:focus-visible) { outline: none; }
+
+  /* ── Page shell ── */
+  .page { background: #080C18; min-height: 100vh; font-family: 'Inter', system-ui, sans-serif; color: #E8F0FF; }
+
+  /* ── Header ── */
+  .header { border-bottom: 1px solid #1A2540; }
+  .header-inner { max-width: 1200px; margin: 0 auto; padding: 24px 16px 0; }
+  .eyebrow { font-size: 11px; letter-spacing: 0.18em; color: #5B8DFF; text-transform: uppercase; font-weight: 600; margin-bottom: 10px; font-family: 'JetBrains Mono', monospace; }
+  .header-title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.25; margin-bottom: 10px; }
+  .header-sub { color: #6677AA; font-size: 14px; line-height: 1.65; margin-bottom: 20px; }
+
+  /* ── Tabs ── */
+  .tabs { display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 0; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab-btn { background: none; border: none; cursor: pointer; padding: 12px 18px; white-space: nowrap; color: #6677AA; font-size: 13px; font-weight: 400; font-family: inherit; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s; min-height: 56px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; }
+  .tab-btn.active { color: #E8F0FF; font-weight: 600; border-bottom-color: #00FF94; }
+  .tab-sublabel { font-size: 10px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em; color: #4A5880; }
+  .tab-btn.active .tab-sublabel { color: #00FF94; }
+
+  /* ── Body layout ── */
+  .body { max-width: 1200px; margin: 0 auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 20px; }
+
+  /* ── Stats strip (mobile) ── */
+  .stats-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-box { background: #0A0F1E; border: 1px solid #1A2540; border-radius: 12px; padding: 14px 16px; }
+  .stat-box.accent { background: linear-gradient(135deg, #0F1E14, #0A1520); border-color: rgba(0,255,148,0.25); }
+  .stat-label { font-size: 11px; color: #4A5880; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+  .stat-delta { font-size: 36px; font-weight: 700; color: #00FF94; line-height: 1; }
+  .stat-delta sup { font-size: 16px; }
+  .stat-evalname { font-size: 12px; color: #6677AA; margin-top: 3px; }
+  .stat-score-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .stat-score-box { flex: 1; background: #060A14; border-radius: 6px; padding: 8px; text-align: center; }
+  .stat-score-num { font-size: 20px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+  .stat-score-tag { font-size: 10px; color: #4A5880; margin-top: 2px; }
+  .stat-arrow { color: #4A5880; font-size: 16px; flex-shrink: 0; }
+
+  /* ── Sidebar (desktop only) ── */
+  .sidebar { display: none; }
+  .sidebar-card { background: #0A0F1E; border: 1px solid #1A2540; border-radius: 12px; padding: 18px 20px; margin-bottom: 14px; }
+  .sidebar-card.accent { background: linear-gradient(135deg, #0F1E14, #0A1520); border-color: rgba(0,255,148,0.25); }
+
+  /* ── Score bars ── */
+  .scorebar { margin-bottom: 14px; }
+  .scorebar-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; gap: 8px; }
+  .scorebar-model { font-size: 12px; font-family: 'JetBrains Mono', monospace; line-height: 1.3; }
+  .scorebar-note { font-size: 10px; color: #4A5880; display: block; margin-top: 1px; }
+  .scorebar-pct { font-size: 13px; font-weight: 700; font-family: 'JetBrains Mono', monospace; flex-shrink: 0; }
+  .scorebar-track { height: 4px; background: #1A2540; border-radius: 2px; }
+  .scorebar-fill { height: 100%; border-radius: 2px; transition: width 0.8s ease; }
+  .score-legend { display: flex; gap: 16px; font-size: 11px; color: #4A5880; padding-top: 14px; border-top: 1px solid #1A2540; margin-top: 14px; }
+
+  /* ── About card (mobile) ── */
+  .about-card { background: #0A0F1E; border: 1px solid #1A2540; border-radius: 12px; padding: 14px 16px; }
+  .section-label { font-size: 11px; letter-spacing: 0.1em; color: #4A5880; text-transform: uppercase; font-weight: 600; margin-bottom: 8px; display: block; }
+  .about-text { font-size: 13px; color: #6677AA; line-height: 1.65; }
+
+  /* ── Problems section ── */
+  .problems-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .problems-title { font-size: 17px; font-weight: 700; }
+  .problems-count { font-size: 11px; color: #4A5880; background: #0F1729; border: 1px solid #1A2540; padding: 3px 10px; border-radius: 12px; }
+
+  /* ── Problem card ── */
+  .problem-card { border: 1px solid #1A2540; border-radius: 12px; margin-bottom: 10px; overflow: hidden; background: #0A0F1E; }
+  .problem-toggle { width: 100%; background: none; border: none; cursor: pointer; padding: 16px; display: flex; align-items: flex-start; gap: 12px; text-align: left; font-family: inherit; min-height: 64px; }
+  .problem-toggle-inner { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .mode-pill { display: inline-block; padding: 3px 9px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; font-family: 'JetBrains Mono', monospace; align-self: flex-start; }
+  .problem-title { font-size: 14px; font-weight: 600; color: #D0DCFF; line-height: 1.4; }
+  .problem-chevron { color: #4A5880; font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+
+  /* ── Problem body ── */
+  .problem-body { padding: 0 16px 20px; border-top: 1px solid #1A2540; }
+  .problem-source { font-size: 11px; color: #4A5880; font-family: 'JetBrains Mono', monospace; padding: 12px 0 16px; line-height: 1.5; }
+  .content-block { margin-bottom: 16px; }
+  .question-box { background: #0C1220; border: 1px solid #1E2E50; border-left: 3px solid #2A4080; border-radius: 8px; padding: 14px 16px; font-size: 14px; color: #B0C4F0; line-height: 1.7; font-family: Georgia, serif; white-space: pre-wrap; }
+  .context-box { background: #0C1220; border-left: 3px solid #2A4080; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #8899CC; line-height: 1.65; }
+  .why-text { font-size: 13px; color: #6677AA; line-height: 1.65; font-style: italic; }
+
+  /* ── Model response ── */
+  .response { border-radius: 10px; overflow: hidden; margin-top: 10px; }
+  .response:first-child { margin-top: 0; }
+  .response-header { padding: 10px 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; gap: 8px; }
+  .response-model { font-size: 13px; color: #A0B4FF; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+  .response-tag { font-size: 10px; font-family: 'JetBrains Mono', monospace; font-weight: 600; letter-spacing: 0.04em; padding: 3px 8px; border-radius: 4px; margin-left: auto; }
+  .response-body { padding: 14px; }
+  .code-block { background: #060A14; border: 1px solid #1A2540; border-radius: 8px; padding: 14px; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 12px; line-height: 1.7; color: #C8D8FF; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+  .analyst-note { margin-top: 10px; padding: 10px 12px; background: #080C18; border-radius: 6px; }
+  .analyst-label { font-size: 10px; color: #4A5880; font-weight: 700; letter-spacing: 0.08em; display: block; margin-bottom: 4px; text-transform: uppercase; }
+  .analyst-text { font-size: 13px; color: #8899CC; line-height: 1.65; }
+
+  /* ── Status pill ── */
+  .pill { display: inline-block; padding: 3px 9px; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; font-family: 'JetBrains Mono', monospace; flex-shrink: 0; }
+
+  /* ── Methodology note ── */
+  .method-note { margin-top: 20px; padding: 14px 16px; background: #0A0F1E; border: 1px solid #1A2540; border-radius: 10px; }
+  .method-text { font-size: 12px; color: #4A5880; line-height: 1.65; }
+
+  /* ── Scores drawer (mobile toggle) ── */
+  .scores-drawer { background: #0A0F1E; border: 1px solid #1A2540; border-radius: 12px; overflow: hidden; }
+  .scores-drawer-toggle { width: 100%; background: none; border: none; cursor: pointer; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; font-family: inherit; color: #E8F0FF; }
+  .scores-drawer-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #4A5880; }
+  .scores-drawer-body { padding: 0 16px 16px; }
+
+  /* ── Desktop breakpoint ── */
+  @media (min-width: 768px) {
+    .header-inner { padding: 28px 32px 0; }
+    .header-title { font-size: 28px; }
+    .tab-btn { padding: 14px 22px; }
+    .body { flex-direction: row; align-items: flex-start; padding: 28px 32px; gap: 24px; }
+    .stats-strip { display: none; }
+    .about-card { display: none; }
+    .scores-drawer { display: none; }
+    .sidebar { display: block; width: 260px; flex-shrink: 0; position: sticky; top: 20px; }
+    .problems-title { font-size: 19px; }
+    .problem-toggle { padding: 16px 20px; }
+    .problem-toggle-inner { flex-direction: row; align-items: center; gap: 12px; }
+    .mode-pill { align-self: auto; }
+    .problem-body { padding: 0 20px 20px; }
+    .code-block { font-size: 11.5px; }
+  }
+
+  @media (min-width: 1024px) {
+    .header-inner { padding: 28px 40px 0; }
+    .body { padding: 32px 40px; }
+    .sidebar { width: 280px; }
+  }
+`;
+
 function StatusPill({ status }) {
-  const config = {
-    pass: { label: "PASS", bg: "rgba(0,255,148,0.12)", color: "#00FF94", border: "rgba(0,255,148,0.25)" },
-    fail: { label: "FAIL", bg: "rgba(255,61,90,0.12)", color: "#FF3D5A", border: "rgba(255,61,90,0.25)" },
-    partial: { label: "PARTIAL", bg: "rgba(255,181,71,0.12)", color: "#FFB547", border: "rgba(255,181,71,0.25)" },
+  const cfg = {
+    pass:    { label: "PASS",    bg: "rgba(0,255,148,0.12)",  color: "#00FF94", border: "rgba(0,255,148,0.3)" },
+    fail:    { label: "FAIL",    bg: "rgba(255,61,90,0.12)",  color: "#FF3D5A", border: "rgba(255,61,90,0.3)" },
+    partial: { label: "PARTIAL", bg: "rgba(255,181,71,0.12)", color: "#FFB547", border: "rgba(255,181,71,0.3)" },
   }[status];
   return (
-    <span style={{
-      display: "inline-block", padding: "2px 8px", borderRadius: "4px",
-      background: config.bg, color: config.color, border: `1px solid ${config.border}`,
-      fontSize: "10px", fontWeight: "700", letterSpacing: "0.1em", fontFamily: "monospace",
-    }}>{config.label}</span>
+    <span className="pill" style={{ background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}` }}>
+      {cfg.label}
+    </span>
   );
 }
 
 function ScoreBar({ model, score, isBaseline, isBest, note, maxScore }) {
   const pct = Math.min((score / maxScore) * 100, 100);
   const color = isBest ? "#00FF94" : isBaseline ? "#5B8DFF" : score >= 70 ? "#7BCFFF" : score >= 40 ? "#8899CC" : "#4A5880";
+  const labelColor = isBaseline ? "#A0B4FF" : isBest ? "#00FF94" : "#6677AA";
   return (
-    <div style={{ marginBottom: "14px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
-        <div>
-          <span style={{ fontSize: "11px", color: isBaseline ? "#A0B4FF" : isBest ? "#00FF94" : "#6677AA", fontFamily: "monospace" }}>
+    <div className="scorebar">
+      <div className="scorebar-row">
+        <div style={{ minWidth: 0 }}>
+          <span className="scorebar-model" style={{ color: labelColor }}>
             {isBaseline ? "⬤ " : isBest ? "★ " : "  "}{model}
           </span>
-          {note && <span style={{ fontSize: "9px", color: "#4A5880", marginLeft: "6px" }}>{note}</span>}
+          {note && <span className="scorebar-note">{note}</span>}
         </div>
-        <span style={{ fontSize: "12px", fontWeight: "700", color, fontFamily: "monospace" }}>{score}%</span>
+        <span className="scorebar-pct" style={{ color }}>{score}%</span>
       </div>
-      <div style={{ height: "3px", background: "#1A2540", borderRadius: "2px" }}>
-        <div style={{ width: `${pct}%`, height: "100%", background: color, borderRadius: "2px", transition: "width 1s ease" }} />
+      <div className="scorebar-track">
+        <div className="scorebar-fill" style={{ width: `${pct}%`, background: color }} />
       </div>
     </div>
   );
 }
 
-function CodeBlock({ children }) {
-  return (
-    <pre style={{
-      background: "#060A14", border: "1px solid #1A2540", borderRadius: "8px",
-      padding: "14px 16px", margin: "0", fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
-      fontSize: "11.5px", lineHeight: "1.7", color: "#C8D8FF", overflowX: "auto",
-      whiteSpace: "pre-wrap", wordBreak: "break-word",
-    }}>{children}</pre>
-  );
-}
-
-function ModelResponse({ response, isFirst }) {
+function ModelResponse({ response }) {
   const isPass = response.status === "pass";
   const isFail = response.status === "fail";
   const borderColor = isPass ? "rgba(0,255,148,0.2)" : isFail ? "rgba(255,61,90,0.2)" : "rgba(255,181,71,0.2)";
   const accentColor = isPass ? "#00FF94" : isFail ? "#FF3D5A" : "#FFB547";
-
+  const headerBg = isPass ? "rgba(0,255,148,0.05)" : isFail ? "rgba(255,61,90,0.05)" : "rgba(255,181,71,0.05)";
   return (
-    <div style={{ border: `1px solid ${borderColor}`, borderRadius: "10px", overflow: "hidden", marginTop: isFirst ? "0" : "12px" }}>
-      <div style={{ padding: "10px 14px", background: isPass ? "rgba(0,255,148,0.05)" : isFail ? "rgba(255,61,90,0.05)" : "rgba(255,181,71,0.05)", display: "flex", alignItems: "center", gap: "10px", borderBottom: `1px solid ${borderColor}` }}>
+    <div className="response" style={{ border: `1px solid ${borderColor}` }}>
+      <div className="response-header" style={{ background: headerBg, borderBottom: `1px solid ${borderColor}` }}>
         <StatusPill status={response.status} />
-        <span style={{ fontSize: "12px", color: "#A0B4FF", fontWeight: "600", fontFamily: "monospace" }}>{response.model}</span>
+        <span className="response-model">{response.model}</span>
         {response.tag && (
-          <span style={{ marginLeft: "auto", fontSize: "9px", color: accentColor, background: `${accentColor}18`, border: `1px solid ${accentColor}30`, padding: "2px 7px", borderRadius: "3px", fontFamily: "monospace", fontWeight: "600", letterSpacing: "0.05em" }}>
+          <span className="response-tag" style={{ color: accentColor, background: `${accentColor}14`, border: `1px solid ${accentColor}28` }}>
             {response.tag}
           </span>
         )}
       </div>
-      <div style={{ padding: "14px" }}>
-        <CodeBlock>{response.excerpt}</CodeBlock>
-        <div style={{ marginTop: "10px", padding: "10px 12px", background: "#0A0F1E", borderRadius: "6px", borderLeft: `2px solid ${accentColor}` }}>
-          <span style={{ fontSize: "10px", color: "#4A5880", fontWeight: "700", letterSpacing: "0.08em", display: "block", marginBottom: "4px" }}>ANALYST NOTE</span>
-          <p style={{ margin: "0", fontSize: "12px", color: "#8899CC", lineHeight: "1.6" }}>{response.annotation}</p>
+      <div className="response-body">
+        <pre className="code-block">{response.excerpt}</pre>
+        <div className="analyst-note" style={{ borderLeft: `2px solid ${accentColor}` }}>
+          <span className="analyst-label">Analyst Note</span>
+          <p className="analyst-text">{response.annotation}</p>
         </div>
       </div>
     </div>
@@ -518,53 +643,50 @@ function ModelResponse({ response, isFirst }) {
 
 function ProblemCard({ problem, isExpanded, onToggle }) {
   return (
-    <div style={{ border: "1px solid #1A2540", borderRadius: "12px", marginBottom: "12px", overflow: "hidden", background: "#0A0F1E" }}>
-      <div
-        onClick={onToggle}
-        style={{ padding: "16px 20px", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", userSelect: "none" }}
-      >
-        <span style={{
-          display: "inline-block", padding: "3px 10px", borderRadius: "4px",
-          background: `${problem.modeColor}15`, color: problem.modeColor,
-          border: `1px solid ${problem.modeColor}30`,
-          fontSize: "10px", fontWeight: "700", letterSpacing: "0.1em", fontFamily: "monospace", flexShrink: 0,
-        }}>{problem.mode}</span>
-        <span style={{ fontSize: "14px", fontWeight: "600", color: "#D0DCFF", flex: 1 }}>{problem.title}</span>
-        <span style={{ color: "#4A5880", fontSize: "18px", flexShrink: 0 }}>{isExpanded ? "▲" : "▼"}</span>
-      </div>
+    <div className="problem-card">
+      <button className="problem-toggle" onClick={onToggle} aria-expanded={isExpanded}>
+        <div className="problem-toggle-inner">
+          <span
+            className="mode-pill"
+            style={{
+              background: `${problem.modeColor}15`,
+              color: problem.modeColor,
+              border: `1px solid ${problem.modeColor}30`,
+            }}
+          >
+            {problem.mode}
+          </span>
+          <span className="problem-title">{problem.title}</span>
+        </div>
+        <span className="problem-chevron">{isExpanded ? "▲" : "▼"}</span>
+      </button>
 
       {isExpanded && (
-        <div style={{ padding: "0 20px 20px" }}>
-          <div style={{ fontSize: "10px", color: "#4A5880", fontFamily: "monospace", marginBottom: "12px", paddingTop: "12px", borderTop: "1px solid #1A2540" }}>
-            {problem.taskId}
-          </div>
+        <div className="problem-body">
+          <p className="problem-source">{problem.taskId}</p>
 
           {problem.question && (
-            <div style={{ marginBottom: "16px" }}>
-              <div style={{ fontSize: "10px", letterSpacing: "0.1em", color: "#4A5880", textTransform: "uppercase", marginBottom: "8px", fontWeight: "600" }}>The Question</div>
-              <div style={{ background: "#0C1220", border: "1px solid #1E2E50", borderRadius: "8px", padding: "14px 16px", fontSize: "13px", color: "#B0C4F0", lineHeight: "1.7", fontFamily: "Georgia, serif", borderLeft: "3px solid #2A4080" }}>
-                {problem.question}
-              </div>
+            <div className="content-block">
+              <span className="section-label">The Question</span>
+              <div className="question-box">{problem.question}</div>
             </div>
           )}
 
           {problem.context && !problem.question && (
-            <div style={{ marginBottom: "16px" }}>
-              <div style={{ fontSize: "10px", letterSpacing: "0.1em", color: "#4A5880", textTransform: "uppercase", marginBottom: "8px", fontWeight: "600" }}>Task Description</div>
-              <p style={{ margin: "0", fontSize: "13px", color: "#8899CC", lineHeight: "1.6", background: "#0C1220", padding: "12px 14px", borderRadius: "8px", borderLeft: "3px solid #2A4080" }}>
-                {problem.context}
-              </p>
+            <div className="content-block">
+              <span className="section-label">Task Description</span>
+              <p className="context-box">{problem.context}</p>
             </div>
           )}
 
-          <div style={{ marginBottom: "14px" }}>
-            <div style={{ fontSize: "10px", letterSpacing: "0.1em", color: "#4A5880", textTransform: "uppercase", marginBottom: "4px", fontWeight: "600" }}>Why It's Hard</div>
-            <p style={{ margin: "0", fontSize: "12px", color: "#6677AA", lineHeight: "1.6", fontStyle: "italic" }}>{problem.why}</p>
+          <div className="content-block">
+            <span className="section-label">Why It's Hard</span>
+            <p className="why-text">{problem.why}</p>
           </div>
 
           <div>
-            <div style={{ fontSize: "10px", letterSpacing: "0.1em", color: "#4A5880", textTransform: "uppercase", marginBottom: "10px", fontWeight: "600" }}>Model Responses</div>
-            {problem.responses.map((r, i) => <ModelResponse key={i} response={r} isFirst={i === 0} />)}
+            <span className="section-label">Model Responses</span>
+            {problem.responses.map((r, i) => <ModelResponse key={i} response={r} />)}
           </div>
         </div>
       )}
@@ -572,119 +694,141 @@ function ProblemCard({ problem, isExpanded, onToggle }) {
   );
 }
 
+function ScoresPanel({ ev }) {
+  return (
+    <>
+      {ev.scores.map((s, i) => <ScoreBar key={i} {...s} maxScore={100} />)}
+      <div className="score-legend">
+        <span><span style={{ color: "#5B8DFF" }}>⬤</span> Opus 4.6 baseline</span>
+        <span><span style={{ color: "#00FF94" }}>★</span> Best model</span>
+      </div>
+    </>
+  );
+}
+
 export default function App() {
   const [activeEval, setActiveEval] = useState("arc");
   const [expandedProblem, setExpandedProblem] = useState(0);
+  const [scoresOpen, setScoresOpen] = useState(false);
   const ev = EVALS[activeEval];
   const delta = ev.best - ev.opus46;
 
+  const switchEval = (id) => { setActiveEval(id); setExpandedProblem(0); setScoresOpen(false); };
   const toggleProblem = (i) => setExpandedProblem(expandedProblem === i ? -1 : i);
 
   return (
-    <div style={{ background: "#080C18", minHeight: "100vh", fontFamily: "'Inter', system-ui, sans-serif", color: "#E8F0FF" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
-        * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #0A0E1A; }
-        ::-webkit-scrollbar-thumb { background: #1A2540; border-radius: 3px; }
-        button:focus { outline: none; }
-      `}</style>
+    <div className="page">
+      <style>{CSS}</style>
 
-      {/* Header */}
-      <div style={{ padding: "28px 36px 0", borderBottom: "1px solid #1A2540", paddingBottom: "0" }}>
-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "24px" }}>
-            <div>
-              <div style={{ fontSize: "10px", letterSpacing: "0.2em", color: "#5B8DFF", textTransform: "uppercase", fontWeight: "600", marginBottom: "6px", fontFamily: "'JetBrains Mono', monospace" }}>Frontier AI · Capability Delta Analysis · June 2026</div>
-              <h1 style={{ margin: "0 0 6px", fontSize: "28px", fontWeight: "700", letterSpacing: "-0.02em", lineHeight: "1.2" }}>
-                Where Claude Opus 4.6 Fails —<br />and What Changed
-              </h1>
-              <p style={{ margin: "0", color: "#6677AA", fontSize: "14px", maxWidth: "580px", lineHeight: "1.6" }}>
-                Concrete problems, documented failure modes, and verified improvements across 4 public frontier evaluations. Sources: ARC Prize, Epoch AI, Scale AI SEAL, Datacurve / VentureBeat, lastexam.ai.
-              </p>
-            </div>
-            <div style={{ flexShrink: 0, background: "#0F1729", border: "1px solid #1A2540", borderRadius: "12px", padding: "16px 20px", textAlign: "center", minWidth: "140px" }}>
-              <div style={{ fontSize: "10px", color: "#4A5880", fontWeight: "600", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "4px" }}>Evals Covered</div>
-              <div style={{ fontSize: "36px", fontWeight: "700", color: "#00FF94", lineHeight: "1" }}>4</div>
-              <div style={{ fontSize: "10px", color: "#4A5880", marginTop: "4px" }}>public benchmarks</div>
-            </div>
-          </div>
+      {/* ── Header ── */}
+      <header className="header">
+        <div className="header-inner">
+          <p className="eyebrow">Frontier AI · Capability Delta Analysis · June 2026</p>
+          <h1 className="header-title">Where Claude Opus 4.6 Fails —<br />and What Changed</h1>
+          <p className="header-sub">
+            Concrete problems, documented failure modes, and verified improvements across 4 public frontier evaluations.
+            Sources: ARC Prize, Epoch AI, Scale AI SEAL, Datacurve / VentureBeat, lastexam.ai.
+          </p>
 
-          {/* Eval Tabs */}
-          <div style={{ display: "flex", gap: "0", overflowX: "auto" }}>
-            {Object.values(EVALS).map((e) => {
-              const active = activeEval === e.id;
-              return (
-                <button
-                  key={e.id}
-                  onClick={() => { setActiveEval(e.id); setExpandedProblem(0); }}
-                  style={{
-                    background: "none", border: "none", cursor: "pointer",
-                    padding: "14px 22px",
-                    color: active ? "#E8F0FF" : "#6677AA",
-                    borderBottom: active ? "2px solid #00FF94" : "2px solid transparent",
-                    fontSize: "13px", fontWeight: active ? "600" : "400",
-                    marginBottom: "-1px", transition: "color 0.15s, border-color 0.15s",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  <span style={{ color: active ? "#00FF94" : "#4A5880", fontSize: "10px", display: "block", fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.05em" }}>{e.sublabel}</span>
-                  {e.label}
-                </button>
-              );
-            })}
-          </div>
+          {/* Tabs */}
+          <nav className="tabs" role="tablist">
+            {Object.values(EVALS).map((e) => (
+              <button
+                key={e.id}
+                role="tab"
+                aria-selected={activeEval === e.id}
+                className={`tab-btn${activeEval === e.id ? " active" : ""}`}
+                onClick={() => switchEval(e.id)}
+              >
+                <span className="tab-sublabel">{e.sublabel}</span>
+                {e.label}
+              </button>
+            ))}
+          </nav>
         </div>
-      </div>
+      </header>
 
-      {/* Main content */}
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "32px 36px", display: "flex", gap: "28px", alignItems: "flex-start" }}>
+      {/* ── Body ── */}
+      <main className="body">
 
-        {/* Left: Score panel */}
-        <div style={{ width: "280px", flexShrink: 0 }}>
-          {/* Delta callout */}
-          <div style={{ background: "linear-gradient(135deg, #0F1E14, #0A1520)", border: "1px solid rgba(0,255,148,0.2)", borderRadius: "12px", padding: "18px 20px", marginBottom: "16px" }}>
-            <div style={{ fontSize: "10px", color: "#4A5880", fontWeight: "600", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "6px" }}>Opus 4.6 → Best Model</div>
-            <div style={{ fontSize: "42px", fontWeight: "700", color: "#00FF94", lineHeight: "1", marginBottom: "4px" }}>+{delta.toFixed(1)}<span style={{ fontSize: "20px" }}>pp</span></div>
-            <div style={{ fontSize: "12px", color: "#6677AA" }}>on {ev.label}</div>
-            <div style={{ marginTop: "10px", display: "flex", gap: "8px" }}>
-              <div style={{ flex: 1, background: "#0A1018", borderRadius: "6px", padding: "8px 10px", textAlign: "center" }}>
-                <div style={{ fontSize: "18px", fontWeight: "700", color: "#5B8DFF", fontFamily: "monospace" }}>{ev.opus46}%</div>
-                <div style={{ fontSize: "9px", color: "#4A5880", marginTop: "2px" }}>Opus 4.6</div>
+        {/* Sidebar — desktop only */}
+        <aside className="sidebar">
+          <div className="sidebar-card accent">
+            <span className="section-label">Opus 4.6 → Best Model</span>
+            <div className="stat-delta">+{delta.toFixed(1)}<sup>pp</sup></div>
+            <p className="stat-evalname">on {ev.label}</p>
+            <div className="stat-score-row" style={{ marginTop: "12px" }}>
+              <div className="stat-score-box">
+                <div className="stat-score-num" style={{ color: "#5B8DFF" }}>{ev.opus46}%</div>
+                <div className="stat-score-tag">Opus 4.6</div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", color: "#4A5880", fontSize: "14px" }}>→</div>
-              <div style={{ flex: 1, background: "#0A1018", borderRadius: "6px", padding: "8px 10px", textAlign: "center" }}>
-                <div style={{ fontSize: "18px", fontWeight: "700", color: "#00FF94", fontFamily: "monospace" }}>{ev.best}%</div>
-                <div style={{ fontSize: "9px", color: "#4A5880", marginTop: "2px" }}>{ev.bestModel.split(" ").slice(-2).join(" ")}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Score bars */}
-          <div style={{ background: "#0A0F1E", border: "1px solid #1A2540", borderRadius: "12px", padding: "18px 20px" }}>
-            <div style={{ fontSize: "10px", color: "#4A5880", fontWeight: "600", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "16px" }}>Score Progression</div>
-            {ev.scores.map((s, i) => <ScoreBar key={i} {...s} maxScore={100} />)}
-            <div style={{ marginTop: "16px", paddingTop: "14px", borderTop: "1px solid #1A2540" }}>
-              <div style={{ display: "flex", gap: "16px", fontSize: "10px", color: "#4A5880" }}>
-                <span><span style={{ color: "#5B8DFF" }}>⬤</span> Opus 4.6 baseline</span>
-                <span><span style={{ color: "#00FF94" }}>★</span> Best model</span>
+              <span className="stat-arrow">→</span>
+              <div className="stat-score-box">
+                <div className="stat-score-num" style={{ color: "#00FF94" }}>{ev.best}%</div>
+                <div className="stat-score-tag">{ev.bestModel.split(" ").slice(-2).join(" ")}</div>
               </div>
             </div>
           </div>
 
-          {/* Eval description */}
-          <div style={{ background: "#0A0F1E", border: "1px solid #1A2540", borderRadius: "12px", padding: "16px 20px", marginTop: "16px" }}>
-            <div style={{ fontSize: "10px", color: "#4A5880", fontWeight: "600", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "8px" }}>About This Eval</div>
-            <p style={{ margin: "0", fontSize: "12px", color: "#6677AA", lineHeight: "1.6" }}>{ev.description}</p>
+          <div className="sidebar-card">
+            <span className="section-label">Score Progression</span>
+            <ScoresPanel ev={ev} />
+          </div>
+
+          <div className="sidebar-card" style={{ marginBottom: 0 }}>
+            <span className="section-label">About This Eval</span>
+            <p className="about-text">{ev.description}</p>
+          </div>
+        </aside>
+
+        {/* Mobile stats strip */}
+        <div className="stats-strip">
+          <div className="stat-box accent" style={{ gridColumn: "1 / -1" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+              <div>
+                <span className="section-label" style={{ marginBottom: "4px" }}>Opus 4.6 → Best Model</span>
+                <div className="stat-delta">+{delta.toFixed(1)}<sup>pp</sup></div>
+                <p className="stat-evalname">on {ev.label}</p>
+              </div>
+              <div className="stat-score-row" style={{ margin: 0, flexDirection: "column", gap: "6px", alignItems: "flex-end" }}>
+                <div style={{ textAlign: "right" }}>
+                  <div className="stat-score-num" style={{ color: "#5B8DFF" }}>{ev.opus46}%</div>
+                  <div className="stat-score-tag">Opus 4.6</div>
+                </div>
+                <span style={{ color: "#4A5880", fontSize: "12px" }}>↓</span>
+                <div style={{ textAlign: "right" }}>
+                  <div className="stat-score-num" style={{ color: "#00FF94" }}>{ev.best}%</div>
+                  <div className="stat-score-tag">{ev.bestModel.split(" ").slice(-2).join(" ")}</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Right: Problems */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px" }}>
-            <h2 style={{ margin: "0", fontSize: "18px", fontWeight: "700" }}>{ev.label} — Concrete Failure Cases</h2>
-            <span style={{ fontSize: "11px", color: "#4A5880", background: "#0F1729", border: "1px solid #1A2540", padding: "3px 10px", borderRadius: "12px" }}>{ev.problems.length} documented problems</span>
+        {/* Mobile about */}
+        <div className="about-card">
+          <span className="section-label">About This Eval</span>
+          <p className="about-text">{ev.description}</p>
+        </div>
+
+        {/* Mobile scores drawer */}
+        <div className="scores-drawer">
+          <button className="scores-drawer-toggle" onClick={() => setScoresOpen(o => !o)} aria-expanded={scoresOpen}>
+            <span className="scores-drawer-label">Score Progression</span>
+            <span style={{ color: "#4A5880", fontSize: "14px" }}>{scoresOpen ? "▲" : "▼"}</span>
+          </button>
+          {scoresOpen && (
+            <div className="scores-drawer-body">
+              <ScoresPanel ev={ev} />
+            </div>
+          )}
+        </div>
+
+        {/* Problems */}
+        <section style={{ flex: 1, minWidth: 0 }}>
+          <div className="problems-header">
+            <h2 className="problems-title">{ev.label} — Failure Cases</h2>
+            <span className="problems-count">{ev.problems.length} documented</span>
           </div>
 
           {ev.problems.map((problem, i) => (
@@ -696,15 +840,18 @@ export default function App() {
             />
           ))}
 
-          {/* Footer note */}
-          <div style={{ marginTop: "24px", padding: "14px 18px", background: "#0A0F1E", border: "1px solid #1A2540", borderRadius: "10px" }}>
-            <div style={{ fontSize: "10px", color: "#4A5880", fontWeight: "600", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "6px" }}>Methodology Note</div>
-            <p style={{ margin: "0", fontSize: "11px", color: "#4A5880", lineHeight: "1.6" }}>
-              Model responses are reconstructed from documented failure patterns in primary sources (ARC Prize Technical Report, Datacurve/VentureBeat DeepSWE audit, Epoch AI open problems, lastexam.ai). HLE questions are verbatim from lastexam.ai public set. ARC-AGI-2 task IDs link to playable puzzles at arcprize.org. All benchmark scores: vendor-reported unless noted as Scale SEAL standardized.
+          <div className="method-note">
+            <span className="section-label">Methodology Note</span>
+            <p className="method-text">
+              Model responses are reconstructed from documented failure patterns in primary sources (ARC Prize Technical Report,
+              Datacurve/VentureBeat DeepSWE audit, Epoch AI open problems, lastexam.ai). HLE questions are verbatim from
+              lastexam.ai public set. ARC-AGI-2 task IDs link to playable puzzles at arcprize.org. All benchmark scores:
+              vendor-reported unless noted as Scale SEAL standardized.
             </p>
           </div>
-        </div>
-      </div>
+        </section>
+
+      </main>
     </div>
   );
 }
